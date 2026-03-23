@@ -1,0 +1,51 @@
+/* =============================================================
+   Main CSS entry point — IT Platform Core
+   Import order matters: tokens first, then base, then modules.
+   ============================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import './tokens.css';
+@import './reset.css';
+@import './glass.css';
+@import './typography.css';
+@import './layout.css';
+@import './animations.css';
+
+@import './pages/home.css';
+@import './pages/services.css';
+@import './pages/about.css';
+@import './pages/contact.css';
+@import './pages/test-showcase.css';
+
+/* ── Page wrapper ────────────────────────────────────────────── */
+.page-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Background container ────────────────────────────────────── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The wave texture image — fills the viewport, never tiles */
+.bg__image {
+  position: absolute;
+  inset: 0;
+  background: url('/media/liteBackground.png') center / cover no-repeat;
+  transform: scale(1.02);
+  opacity: 0.82;
+}
+
+/* Very faint warm veil — just enough to unify the page tone    */
+/* without obscuring the texture the glass cards blur against.  */
+.bg__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(250, 250, 252, 0.14);
+}

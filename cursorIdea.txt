@@ -1,0 +1,145 @@
+---------------------------------
+HTML
+---------------------------------
+<div>
+    <h1>SVG Magnifier Filter with &lt;feDisplacementMap&gt;</h1>
+    <img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Vincent_van_Gogh_-_Landscape_from_Saint-R%C3%A9my_-_Google_Art_Project.jpg/980px-Vincent_van_Gogh_-_Landscape_from_Saint-R%C3%A9my_-_Google_Art_Project.jpg" />
+</div>
+
+<section id="lens"></section>
+
+<svg id="lens-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
+    <style>
+        #mix {
+            mix-blend-mode: screen;
+        }
+    </style>
+    <linearGradient id="red">
+        <stop offset="0%" stop-color="red" />
+        <stop offset="100%" stop-color="red" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="blue" gradientTransform="rotate(90)">
+        <stop offset="0%" stop-color="blue" />
+        <stop offset="100%" stop-color="blue" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id="grey">
+        <stop offset="10%" stop-color="grey" stop-opacity="1" />
+        <stop offset="90%" stop-color="grey" stop-opacity="0" />
+        <stop offset="100%" stop-color="grey" stop-opacity="1" />
+    </radialGradient>
+    <g>
+        <rect width="1" height="1" fill="black" />
+        <rect width="1" height="1" fill="url(#red)" />
+        <rect width="1" height="1" fill="url(#blue)" id="mix" />
+        <rect width="1" height="1" fill="url(#grey)" />
+    </g>
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="drop" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feImage id="map" />
+            <feDisplacementMap in="SourceGraphic" scale="50" xChannelSelector="R" yChannelSelector="B" result="LENS" />
+            <feFlood flood-color="white" result="FLOOD" />
+            <feMerge>
+                <feMergeNode in="FLOOD" />
+                <feMergeNode in="LENS" />
+            </feMerge>
+        </filter>
+    </defs>
+</svg>
+
+---------------------------------
+CSS
+---------------------------------
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,body {
+    height: 100%;
+}
+body {
+    container: ratio / size;
+    background: black;
+    color: white;
+    font-size: 5rem;
+    padding: 16px;
+}
+
+div {
+    margin: 0 auto;
+    width: min(960px, 100%);
+}
+
+img {
+    width: 100%;
+}
+
+h1 {
+    text-wrap: balance;
+    text-align: center;
+}
+
+svg {
+    position: fixed;
+    top: -10000px;
+}
+#lens-map {
+    width: 0;
+}
+
+@property --angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+#lens {
+    --angle: 0deg;
+    --x: calc(50% + 40% * cos(var(--angle)));
+    --y: calc(50% + 40% * sin(var(--angle)));
+    position: fixed;
+    left: var(--x);
+    top: var(--y);
+    width: 200px;
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    cursor: none;
+    animation: 10s linear infinite move;
+    backdrop-filter: url(#drop);
+    border-radius: 50%;
+    box-shadow: inset 0 0 20px #3F51B5;
+    mix-blend-mode: exclusion;
+}
+
+@keyframes move {
+    0% {
+        --angle: 0deg;
+    }
+    100% {
+        --angle: 359deg;
+    }
+}
+
+@container ratio (aspect-ratio < 1) {
+  div {
+    flex-direction: column;
+  }
+}
+
+---------------------------------
+JavaScript
+---------------------------------
+const map = encodeURIComponent(document.querySelector("#lens-map").outerHTML);
+document
+    .querySelector("#map")
+    .setAttribute("href", `data:image/svg+xml;charset=utf-8,${map}`);
+
+const lens = document.querySelector("#lens");
+
+document.body.addEventListener("mousemove", (evt) => {
+    lens.style.setProperty("--x", `${evt.clientX}px`);
+    lens.style.setProperty("--y", `${evt.clientY}px`);
+});
